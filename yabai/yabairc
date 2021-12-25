@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+sudo yabai --load-sa
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+
+# global settings
+yabai -m config mouse_follows_focus             off
+yabai -m config focus_follows_mouse             off
+yabai -m config window_placement                second_child
+yabai -m config window_topmost                  on
+yabai -m config window_shadow                   float
+yabai -m config window_opacity                  off
+yabai -m config split_ratio                     0.50
+yabai -m config auto_balance                    on
+yabai -m config mouse_modifier                  fn
+yabai -m config mouse_action1                   move
+yabai -m config mouse_action2                   resize
+
+# border
+yabai -m config window_border                   on
+yabai -m config window_border_width             10
+yabai -m config active_window_border_color      0xff98c379
+yabai -m config normal_window_border_color      0xff555555
+yabai -m config insert_feedback_color           0xffd75f5f
+
+# general space settings
+yabai -m config layout                          bsp
+yabai -m config top_padding                     5
+yabai -m config bottom_padding                  5
+yabai -m config left_padding                    5
+yabai -m config right_padding                   5
+yabai -m config window_gap                      5
+
+# specific space settings
+yabai -m config --space 2 layout             stack
+yabai -m config --space 7 layout             float
+
+
+# window rules
+yabai -m rule --add app="^Mail$"                space=2
+yabai -m rule --add app="^Chrome$"              space=2
+
+otherApp='^(IINA|图书|Spotify|Calendar|QQ|访达|日历|System Preferences|系统偏好设置|钉钉|微信)$'
+yabai -m rule --add app="${otherApp}" manage=off

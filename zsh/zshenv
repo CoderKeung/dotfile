@@ -1,0 +1,16 @@
+# Get the colors in the opened man page itself
+export MANPAGER="sh -c 'col -bx | bat -l man -p --paging always'"
+export MANPATH="$(manpath):$HOME/.cache/cppman"
+export PATH="/usr/local/opt/llvm/bin:$HOME/lua-language-server/bin/macOS:$HOME/.npmGlobal/bin:$PATH"
+export LDFLAGS="-L/usr/local/opt/llvm/lib"
+export CPPFLAGS="-I/usr/local/opt/llvm/include"
+export EDITOR="nvim"
+
+export FZF_DEFAULT_OPTS="--color="bg+:#2c323b,fg+:#d54e53,border:#90c966" --height=50% --layout=reverse --border=sharp --preview '(bat -p --color always {} || tree {} || cat {} ) 2> /dev/null'"
+
+# LSCOLORS
+export LSCOLORS="exfxcxdxbxexexabagacad"
+
+export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890
+
+export HOMEBREW_INSTALL_BADGE="☕️ 🐸"

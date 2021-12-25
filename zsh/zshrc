@@ -1,0 +1,93 @@
+# set -o vi
+autoload -Uz compinit && compinit
+
+# case insensitive path-completion 
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
+zstyle ':completion:*' menu select
+
+zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix
+
+
+export PS1='%F{#edbf69}[%2~] %F{#90c966}%# %F{#2bcec2}'
+
+autoload -Uz vcs_info
+precmd_vcs_info() { vcs_info }
+precmd_functions+=( precmd_vcs_info )
+setopt prompt_subst
+RPROMPT=\$vcs_info_msg_0_
+zstyle ':vcs_info:git:*' formats '%F{#c858e9} %b - %r%f'
+zstyle ':vcs_info:*' enable git
+
+alias clash="export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890"
+alias v='nvim'
+alias vim='nvim'
+alias ls='ls -Gal'
+alias lg='lazygit'
+alias luamake=$HOME/lua-language-server/3rd/luamake/luamake
+alias ssh="kitty +kitten ssh"
+
+# fda - including hidden directories
+fda() {
+  local dir
+  dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m --prompt='Dir> ') && cd "$dir"
+}
+
+# fe [FUZZY PATTERN] - Open the selected file with the default editor
+#   - Bypass fuzzy finder if there's only one match (--select-1)
+#   - Exit if there's no match (--exit-0)
+fe() {
+  IFS=$'\n' files=($(fzf-tmux --prompt="File> " --query="$1" --multi --select-1 --exit-0))
+  [[ -n "$files" ]] && ${EDITOR:-nvim} "${files[@]}"
+}
+
+# fkill - kill processes - list only the ones you can kill. Modified the earlier script.
+fkill() {
+    local pid 
+
+    if [ "$UID" != "0" ]; then 
+      pid=$(ps -f -u $UID | sed 1d | fzf -m | awk '{print $2}')
+    else 
+      pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}') 
+    fi  
+
+    if [ "x$pid" != "x" ]; then 
+      echo $pid | xargs kill -${1:-9} 
+    fi  
+}
+
+# fh - repeat history
+fh() {
+  print -z $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed -E 's/ *[0-9]*\*? *//' | sed -E 's/\\/\\\\/g')
+}
+
+fl() {
+  dir="$HOME/.commands"
+  commandsfile=$( find $dir -name '*.md' | sort -n | sed "s#$dir/##; s/\.md//"  | fzf +s --prompt='LinuxCommands> ' --preview "echo $dir/{}.md | xargs -r mdcat -p" | awk '{printf "'$dir'/%s.md", $1}')
+  if [ $commandsfile ]; then 
+    mdcat -p $commandsfile
+  else 
+    echo >> /dev/null 
+  fi
+}
+
+fman() {
+  returnMan=$(man -k . | grep '([0-9])' | fzf --prompt='Man> ' --preview $'echo {} | cut -f1 -d "(" | xargs -r man | col -bx | bat -l man -p --color always' | cut -f1 -d "(")
+  if [ $returnMan ]; then 
+    man $returnMan
+  else 
+    echo >> /dev/null 
+  fi
+}
+
+fcode() {
+  diff=$1;key=$2;tag=$3
+  leetcodePath="$HOME/leetcode"
+  v=$(leetcode list -q $diff $key -t $tag | fzf --preview '' | grep -Eo '\d+]' | tr -d ']') 
+  if [ $v ]; then 
+    leetcode show $v -gxeo $leetcodePath 
+  else 
+    echo >> /dev/null 
+  fi
+}
+
+# figlet -f slant CoderKeung | lolcat
